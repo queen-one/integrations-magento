@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-// Run from the Magento root: php app/code/Rejoiner/Acr/dev/magento/check-tracking.php
+// Run from the Magento root: php app/code/QueenOne/Connect/dev/magento/check-tracking.php
 require getcwd() . '/app/bootstrap.php';
 
 $bootstrap = \Magento\Framework\App\Bootstrap::create(BP, $_SERVER);
 $om = $bootstrap->getObjectManager();
 $om->get(\Magento\Framework\App\State::class)->setAreaCode('frontend');
 $om->configure($om->get(\Magento\Framework\ObjectManager\ConfigLoaderInterface::class)->load('frontend'));
-$module = BP . '/app/code/Rejoiner/Acr';
+$module = BP . '/app/code/QueenOne/Connect';
 $resolver = new \Magento\Framework\Config\Dom\UrnResolver();
 libxml_set_external_entity_loader([$resolver, 'registerEntityLoader']);
 
@@ -26,22 +26,22 @@ foreach (['etc', 'view/frontend/layout'] as $directory) {
 }
 echo "PASS: Magento XML schemas\n";
 
-$jobs = $om->get(\Magento\Cron\Model\ConfigInterface::class)->getJobs();
-foreach ($jobs as $group) {
-    if (isset($group['track_order_success_conversion'])) {
-        throw new RuntimeException('Legacy conversion cron is still registered');
-    }
-}
-$events = $om->get(\Magento\Framework\Event\ConfigInterface::class);
-foreach (['sales_order_save_after', 'checkout_onepage_controller_success_action', 'controller_action_predispatch',
-    'sales_quote_remove_item', 'customer_data_object_login'] as $event) {
-    foreach ($events->getObservers($event) as $observer) {
-        if (str_starts_with($observer['instance'] ?? '', 'Rejoiner\\Acr\\')) {
-            throw new RuntimeException('Legacy observer is still registered');
+// Order delivery runs only from the outbox cron, never inside storefront or order requests.
+$connectJobs = [];
+foreach ($om->get(\Magento\Cron\Model\ConfigInterface::class)->getJobs() as $group) {
+    foreach ($group as $name => $job) {
+        if (str_starts_with($job['instance'] ?? '', 'QueenOne\\Connect\\')) {
+            $connectJobs[] = $name;
         }
     }
 }
-echo "PASS: no legacy cron or observers\n";
+if ($connectJobs !== ['queen_one_order_outbox']) {
+    throw new RuntimeException('Unexpected Connect cron jobs: ' . implode(', ', $connectJobs));
+}
+if (glob($module . '/etc/events.xml') || glob($module . '/etc/*/events.xml')) {
+    throw new RuntimeException('Connect must not register event observers');
+}
+echo "PASS: only the outbox cron and no observers\n";
 
 $scope = new class($om->get(\Magento\Framework\App\Config\ScopeConfigInterface::class)) implements \Magento\Framework\App\Config\ScopeConfigInterface {
     private array $values = [];
@@ -58,11 +58,11 @@ $scope = new class($om->get(\Magento\Framework\App\Config\ScopeConfigInterface::
 foreach (['enabled' => '1', 'site_id' => 'magento-local-fixture', 'tag_url' => 'https://tag.example/queen-one.js'] as $key => $value) {
     $scope->setValue('checkout/queen_one_connect/' . $key, $value);
 }
-$config = new \Rejoiner\Acr\Model\TrackingConfig($scope);
+$config = new \QueenOne\Connect\Model\TrackingConfig($scope);
 if (!$config->isEnabled()) { throw new RuntimeException('Connect configuration not enabled'); }
-$block = $om->create(\Rejoiner\Acr\Block\StorefrontTracking::class, ['config' => $config]);
+$block = $om->create(\QueenOne\Connect\Block\StorefrontTracking::class, ['config' => $config]);
 $json = $block->getInitJson();
-$options = json_decode($json, true, 512, JSON_THROW_ON_ERROR)['*']['Rejoiner_Acr/js/storefront-tracking'];
+$options = json_decode($json, true, 512, JSON_THROW_ON_ERROR)['*']['QueenOne_Connect/js/storefront-tracking'];
 if ($options['siteId'] !== 'magento-local-fixture' || isset($options['identity'])) {
     throw new RuntimeException('Invalid public configuration');
 }
@@ -70,10 +70,10 @@ $section = $om->get(\Magento\Customer\CustomerData\SectionPoolInterface::class)-
 if (($section['queen-one-connect']['version'] ?? null) !== 1) {
     throw new RuntimeException('Queen One section missing');
 }
-$source = $om->create(\Rejoiner\Acr\CustomerData\QueenOne::class, ['config' => $config]);
+$source = $om->create(\QueenOne\Connect\CustomerData\QueenOne::class, ['config' => $config]);
 $data = $source->getSectionData();
 if ($data['status'] === 'error') { throw new RuntimeException('Live section extraction failed'); }
-$policy = $om->create(\Rejoiner\Acr\Model\TagOriginPolicy::class, ['config' => $config]);
+$policy = $om->create(\QueenOne\Connect\Model\TagOriginPolicy::class, ['config' => $config]);
 if ($policy->collect()[0]->getHostSources() !== ['https://tag.example']) {
     throw new RuntimeException('Configured Tag origin missing from CSP');
 }
@@ -86,8 +86,8 @@ echo "PASS: disabled tracking renders no initialization\n";
 // detect an area-level collectors array replacing Magento's global collectors.
 // Replace only this instance's config with the request-local fixture, keeping
 // the installed (including compiled) collector graph intact.
-(new ReflectionProperty(\Rejoiner\Acr\Model\TagOriginPolicy::class, 'config'))->setValue(
-    $om->get(\Rejoiner\Acr\Model\TagOriginPolicy::class),
+(new ReflectionProperty(\QueenOne\Connect\Model\TagOriginPolicy::class, 'config'))->setValue(
+    $om->get(\QueenOne\Connect\Model\TagOriginPolicy::class),
     $config
 );
 $collector = $om->get(\Magento\Csp\Api\PolicyCollectorInterface::class);

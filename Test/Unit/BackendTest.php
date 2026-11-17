@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Rejoiner\Acr\Test\Unit;
+namespace QueenOne\Connect\Test\Unit;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Encryption\EncryptorInterface;
@@ -11,11 +11,11 @@ use Magento\Sales\Model\Order\Item;
 use Magento\Store\Model\StoreManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Rejoiner\Acr\Model\Backend\Config;
-use Rejoiner\Acr\Model\Backend\Envelope;
-use Rejoiner\Acr\Model\Backend\Outbox;
-use Rejoiner\Acr\Model\Backend\Runner;
-use Rejoiner\Acr\Model\Backend\Transport;
+use QueenOne\Connect\Model\Backend\Config;
+use QueenOne\Connect\Model\Backend\Envelope;
+use QueenOne\Connect\Model\Backend\Outbox;
+use QueenOne\Connect\Model\Backend\Runner;
+use QueenOne\Connect\Model\Backend\Transport;
 
 class BackendTest extends TestCase
 {

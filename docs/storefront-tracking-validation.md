@@ -11,11 +11,11 @@ node --test Test/JavaScript/*.test.cjs
 From `.local/magento`, using the installed Magento PHP/PHPUnit:
 
 ```sh
-bin/cli vendor/bin/phpunit --no-configuration --bootstrap app/bootstrap.php app/code/Rejoiner/Acr/Test/Unit
-bin/cli php app/code/Rejoiner/Acr/dev/magento/check-tracking.php
+bin/cli vendor/bin/phpunit --no-configuration --bootstrap app/bootstrap.php app/code/QueenOne/Connect/Test/Unit
+bin/cli php app/code/QueenOne/Connect/dev/magento/check-tracking.php
 ```
 
-The configuration check validates Magento XML schemas, absence of legacy cron/observers, public initialization, private section registration, configured Tag CSP origin, and disabled behavior. It also exercises the installed frontend CSP collector graph with tracking enabled and disabled on home and checkout routes: Magento directives, static allowlists, dynamic nonces and checkout inline restrictions must survive, with only the configured Tag origin added. Its test config is request-local: nothing is saved and no Tag or external delivery executes.
+The configuration check validates Magento XML schemas, that Connect registers only its outbox cron and no observers, public initialization, private section registration, configured Tag CSP origin, and disabled behavior. It also exercises the installed frontend CSP collector graph with tracking enabled and disabled on home and checkout routes: Magento directives, static allowlists, dynamic nonces and checkout inline restrictions must survive, with only the configured Tag origin added. Its test config is request-local: nothing is saved and no Tag or external delivery executes.
 
 Register the Tag collector in global `etc/di.xml`, alongside Magento's collectors; the collector itself limits its contribution to the frontend area. An area-specific `collectors` array replaces the global array instead of extending it ([Magento DI merge rules](https://developer.adobe.com/commerce/php/development/build/dependency-injection-file)). Do not compensate for a missing Magento policy by adding `unsafe-inline` or `unsafe-eval` in this module.
 
@@ -24,8 +24,6 @@ From the repository root:
 ```sh
 MAGENTO_RUN_COMPILE=1 make magento-smoke
 ```
-
-The historical queue/table checks are retained because schema removal is outside this milestone. The old conversion cron registration has been removed.
 
 ## Staging prerequisites
 
@@ -38,7 +36,7 @@ The historical queue/table checks are retained because schema removal is outside
 - Obtain access to the actual downstream staging event view. A queue entry, Tag readiness or HTTP success alone is not downstream confirmation.
 - Use synthetic customer data. Provisioning, consent configuration and enabling real delivery are recorded explicitly below; do not put credentials in evidence.
 
-Set the staging Tag URL through the hidden deployment config path, then open Stores → Configuration → Sales → Checkout → Queen One Connect at the target store view. Set Site ID, enable tracking and optionally debug. Flush config/layout/full-page caches and invalidate the storefront private section after changing site/store configuration. No Rejoiner credentials are needed.
+Set the staging Tag URL through the hidden deployment config path, then open Stores → Configuration → Sales → Checkout → Queen One Connect at the target store view. Set Site ID, enable tracking and optionally debug. Flush config/layout/full-page caches and invalidate the storefront private section after changing site/store configuration.
 
 ## Manual scenarios
 
@@ -46,7 +44,7 @@ Use DevTools Network with Preserve log and count events inside Collector batch b
 
 | Scenario | Expected result |
 | --- | --- |
-| Disabled; old Rejoiner settings still saved | No Connect initialization, Rejoiner script or Rejoiner API traffic |
+| Disabled | No Connect initialization |
 | Home/category/product page | One `page_viewed` each document; product page also one `product_viewed` with entity ID |
 | Initial persisted cart and repeated identical section reloads | One initial `cart_set`; no notification duplicates |
 | Add simple/configurable, update quantity/options, remove one item | Complete `cart_set`, correct parent/child IDs, quantity, quote currency and row amounts |
@@ -58,20 +56,18 @@ Use DevTools Network with Preserve log and count events inside Collector batch b
 | Two store views/sites and full-page cache | Correct site/store config and identifiers; no cached customer data in HTML |
 | Tag 404, blocked/slow script, core/config/Collector failure, throwing/rejecting push | Commerce still works; own errors are contained; no uncontrolled queue/retry loop |
 | Home and restrictive checkout CSP, tracking enabled and disabled | Standard Magento directives remain; enabling tracking adds the configured script origin; checkout retains its inline restrictions and nonce/hash allowances; staging core/config/Collector origins remain allowed |
-| Complete offline-payment checkout and reload success page | Checkout succeeds; zero frontend `order_created`; no legacy conversion API/queue entry |
+| Complete offline-payment checkout and reload success page | Checkout succeeds; zero frontend `order_created` |
 | Bundle/fractional cart | Unsupported cart is skipped with diagnostic, never truncated or treated as empty |
 | Catalog fixture lookup | Published parent/variant IDs resolve to the expected imported Magento products |
-
-Also inspect server-side outbound traffic while exercising newsletter, checkout and old recovery URLs. Static disconnection and an HTTP client guard are implemented; a runtime no-Rejoiner-traffic claim still requires this evidence.
 
 ## Evidence record
 
 | Check | Result / evidence |
 | --- | --- |
-| JS unit scenarios | PASS, 2026-11-02: 18 tests locally and in CI |
-| PHP unit scenarios | PASS, 2026-11-02: 28 tests / 193 assertions, PHPUnit 12.5.33 on PHP 8.5.6 |
-| PHP lint / Magento XML / configuration smoke | PASS, 2026-11-02: all PHP source files, schemas, legacy cron/observer removal, enabled/disabled block, section and configured Tag CSP origin |
-| Magento smoke / DI compilation | PASS, 2026-11-02: Magento 2.4.9, schema up to date, retained tables/columns present, `setup:upgrade`, DI compilation, production-mode static deployment and storefront/checkout HTTP responses |
+| JS unit scenarios | PASS, 2026-11-17: 18 tests locally after the `QueenOne_Connect` rename |
+| PHP unit scenarios | Pending rerun under `QueenOne_Connect`. Last PASS 2026-11-02 under `Rejoiner_Acr`: 28 tests / 193 assertions, PHPUnit 12.5.33 on PHP 8.5.6 |
+| PHP lint / Magento XML / configuration smoke | Pending rerun under `QueenOne_Connect`. Last PASS 2026-11-02 under `Rejoiner_Acr`: all PHP source files, schemas, enabled/disabled block, section and configured Tag CSP origin |
+| Magento smoke / DI compilation | Pending rerun under `QueenOne_Connect`. Last PASS 2026-11-02 under `Rejoiner_Acr`: Magento 2.4.9, schema up to date, `setup:upgrade`, DI compilation, production-mode static deployment and storefront/checkout HTTP responses |
 | CSP regression fix | PASS, 2026-09-14: reproduced lost Magento directives with the frontend DI registration; global registration restores composition. PHP suite: 15 tests / 57 assertions; installed collector graph preserves enabled/disabled home and checkout policies, whitelist and dynamic nonce. DI compilation passed, caches cleaned; actual homepage HTTP 200 carries 14 CSP directives with Magento script permissions and staging Tag/core/Collector origins. Browser recheck remains manual |
 | Real Magento product mapping | PASS, 2026-09-11: unsaved sample quotes; simple 24-MB01 → product 1, qty 2, USD 68; configurable MH01 → parent 62 / variant 47 (MH01-XS-Black), qty 2, USD 104. No order, persisted quote or external event was created |
 | Browser commerce, consent, CSP and Network scenarios | Pending: no connected browser in implementation session |

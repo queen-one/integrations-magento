@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace Rejoiner\Acr\Test\Unit;
+namespace QueenOne\Connect\Test\Unit;
 
 use Magento\Catalog\Model\Product;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Item;
 use Magento\Quote\Model\Quote\Item\Option;
 use PHPUnit\Framework\TestCase;
-use Rejoiner\Acr\Model\CartSnapshot;
+use QueenOne\Connect\Model\CartSnapshot;
 use UnexpectedValueException;
 
 class CartSnapshotTest extends TestCase

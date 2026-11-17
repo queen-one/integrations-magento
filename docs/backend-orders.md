@@ -1,6 +1,6 @@
 # Connect backend orders (Milestone 2)
 
-Status: implementation, not customer-pilot acceptance. No Rejoiner API key is needed.
+Status: implementation, not customer-pilot acceptance.
 Storefront order_created remains disabled; only backend persisted orders are authoritative.
 Consent/list APIs, catalog onboarding and Composer publication remain separate work.
 
@@ -8,7 +8,7 @@ Consent/list APIs, catalog onboarding and Composer publication remain separate w
 
 1. Deploy module code and run `bin/magento setup:upgrade` (back up the database
    using your normal release procedure). New tables are `queen_one_order_boundary`
-   and `queen_one_order_outbox`. The legacy Rejoiner table is untouched.
+   and `queen_one_order_outbox`.
 2. Ops provision an active Magento2 Connect integration with the approved QO site,
    exact Magento store ID and a unique 64-character lowercase hex HMAC secret.
    See Bridge `src/platforms/magento2/events/README.md` and its provisioning script.
@@ -111,9 +111,9 @@ The fixture is not a credential and must not be used for a real installation.
 From the Magento root:
 
 ```
-vendor/bin/phpunit --no-configuration --bootstrap app/bootstrap.php app/code/Rejoiner/Acr/Test/Unit
-php app/code/Rejoiner/Acr/dev/magento/check-tracking.php
-QO_LOCAL_BACKEND_TEST=1 php app/code/Rejoiner/Acr/dev/magento/check-backend-orders.php
+vendor/bin/phpunit --no-configuration --bootstrap app/bootstrap.php app/code/QueenOne/Connect/Test/Unit
+php app/code/QueenOne/Connect/dev/magento/check-tracking.php
+QO_LOCAL_BACKEND_TEST=1 php app/code/QueenOne/Connect/dev/magento/check-backend-orders.php
 ```
 
 The last script is guarded to `queenone-magento.test`. It creates/retains a virtual
@@ -128,5 +128,5 @@ For end-to-end staging: configure a dedicated staging store/site/secret, stop Br
 place one order, run cron and confirm pending. Restore Bridge, wait for backoff or
 operator-retry a failed row, trace the same event ID through outbox → queue → downstream
 order_created. Check configurable/simple identifiers, discounts, guest/registered
-and Admin/API sources, no frontend order duplicate and no Rejoiner traffic. Then
+and Admin/API sources, and no frontend order duplicate. Then
 close M1 browser/five-event/catalog acceptance. Until then, customer pilot is blocked.

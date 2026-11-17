@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Rejoiner\Acr\Model\System\Config\Backend;
+namespace QueenOne\Connect\Model\System\Config\Backend;
 
 use Magento\Framework\App\Config\Value;
 use Magento\Framework\Exception\LocalizedException;
-use Rejoiner\Acr\Model\TrackingConfig;
+use QueenOne\Connect\Model\TrackingConfig;
 
 class TagUrl extends Value
 {

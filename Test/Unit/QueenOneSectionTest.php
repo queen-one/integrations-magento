@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Rejoiner\Acr\Test\Unit;
+namespace QueenOne\Connect\Test\Unit;
 
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Cookie\Helper\Cookie;
@@ -10,9 +10,9 @@ use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
-use Rejoiner\Acr\CustomerData\QueenOne;
-use Rejoiner\Acr\Model\CartSnapshot;
-use Rejoiner\Acr\Model\TrackingConfig;
+use QueenOne\Connect\CustomerData\QueenOne;
+use QueenOne\Connect\Model\CartSnapshot;
+use QueenOne\Connect\Model\TrackingConfig;
 
 class QueenOneSectionTest extends TestCase
 {

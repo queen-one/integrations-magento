@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
     <group id="default">
-        <job name="queen_one_order_outbox" instance="Rejoiner\Acr\Model\Backend\Runner" method="execute">
+        <job name="queen_one_order_outbox" instance="QueenOne\Connect\Model\Backend\Runner" method="execute">
             <schedule>* * * * *</schedule>
         </job>
     </group>

@@ -11,7 +11,7 @@ not committed.
 - PHP, OpenSearch, MariaDB, Valkey, RabbitMQ and nginx versions selected by the
   docker-magento compatibility table;
 - Magento sample data and Mailcatcher;
-- current repository mounted at `app/code/Rejoiner/Acr`, with the generated
+- current repository mounted at `app/code/QueenOne/Connect`, with the generated
   `.local` directory masked from the container.
 
 Magento 2.4.8-p5 can be selected with `MAGENTO_VERSION=2.4.8-p5`. Keep 2.4.9 as
@@ -67,7 +67,7 @@ The command performs these operations in order:
 2. Installs Magento and its local services.
 3. Adds sample data and disables 2FA for this development-only lab.
 4. Activates the bind mount for this repository.
-5. Enables `Rejoiner_Acr` and runs `setup:upgrade`.
+5. Enables `QueenOne_Connect` and runs `setup:upgrade`.
 6. Flushes Magento caches.
 
 Local URLs and default docker-magento credentials:
@@ -100,10 +100,10 @@ It verifies:
 - PHP and Magento runtime availability;
 - the generated `.local/magento` lab is not recursively exposed inside the
   module mount;
-- PHP linting for the compatibility-sensitive helper and observer;
-- `Rejoiner_Acr` module status;
+- PHP linting for all module PHP files;
+- `QueenOne_Connect` module status;
 - Magento database schema status;
-- the plugin queue table, both legacy extension columns and the Queen One order outbox tables;
+- the Queen One order boundary and outbox tables;
 - an HTTPS response from the storefront.
 
 Run dependency-injection compilation as an additional gate:
@@ -111,8 +111,6 @@ Run dependency-injection compilation as an additional gate:
     MAGENTO_RUN_COMPILE=1 make magento-smoke
 
 If a schema assertion fails, keep the failure as evidence and create a bug.
-The legacy setup scripts work in the current compatibility lane, but replacing
-them with declarative schema remains a separate Marketplace-readiness task.
 
 ## Useful commands
 
@@ -124,7 +122,7 @@ them with declarative schema remains a separate Marketplace-readiness task.
 Direct Magento commands can be run from the generated lab:
 
     cd .local/magento
-    bin/magento module:status Rejoiner_Acr
+    bin/magento module:status QueenOne_Connect
     bin/magento cache:flush
     bin/mysql
     bin/log
@@ -136,22 +134,20 @@ containers if you must merge the updated `compose.plugin.yaml` manually. Keep
 the nested `.local` volume mask when merging; bind mounts do not honor
 `.dockerignore` exclusions.
 
-Cron is deliberately not started by this repository. The legacy conversion job
-is disconnected. See [backend orders](../../docs/backend-orders.md) for explicit
+Cron is deliberately not started by this repository. See
+[backend orders](../../docs/backend-orders.md) for explicit
 Connect backend activation, manual cron execution and the local outage test.
 
 ## Storefront tracking validation
 
 Set the staging Tag URL through the hidden deployment config path, then configure
 Stores > Configuration > Sales > Checkout > Queen One Connect with a dedicated
-Magento staging Site ID. Tracking is disabled by default; no Rejoiner credentials
-are required.
+Magento staging Site ID. Tracking is disabled by default.
 
 Use the [tracking validation runbook](../../docs/storefront-tracking-validation.md)
 for automated checks, browser scenarios, CSP/consent checks and downstream evidence.
 The [scope and deferred register](../../docs/storefront-tracking-scope.md) records
 which Rejoiner capabilities are deliberately not migrated in this milestone.
-`BASELINE_TEST_REPORT.md` remains a historical record of the earlier Rejoiner audit.
 
 ## Resetting the lab
 

@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace Rejoiner\Acr\Block;
+namespace QueenOne\Connect\Block;
 
 use Magento\Cookie\Helper\Cookie;
 use Magento\Framework\Registry;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
-use Rejoiner\Acr\Model\TrackingConfig;
+use QueenOne\Connect\Model\TrackingConfig;
 use Throwable;
 
 class StorefrontTracking extends Template
@@ -39,7 +39,7 @@ class StorefrontTracking extends Template
                 'debug' => $this->config->isDebug(),
                 'product' => $product && $product->getId() ? ['product_id' => (string) $product->getId()] : null
             ];
-            return json_encode(['*' => ['Rejoiner_Acr/js/storefront-tracking' => $options]],
+            return json_encode(['*' => ['QueenOne_Connect/js/storefront-tracking' => $options]],
                 JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_THROW_ON_ERROR);
         } catch (Throwable $error) {
             return '';

@@ -16,7 +16,7 @@ $assert = static function (bool $ok, string $message): void {
         throw new RuntimeException($message);
     }
 };
-$config = new class extends \Rejoiner\Acr\Model\Backend\Config {
+$config = new class extends \QueenOne\Connect\Model\Backend\Config {
     public function __construct()
     {
     }
@@ -30,7 +30,7 @@ $config = new class extends \Rejoiner\Acr\Model\Backend\Config {
             'secret' => str_repeat('a', 64), 'endpoint' => 'https://127.0.0.1:1/webhooks/events/magento2/507f1f77bcf86cd799439011'];
     }
 };
-$outbox = $om->get(\Rejoiner\Acr\Model\Backend\Outbox::class);
+$outbox = $om->get(\QueenOne\Connect\Model\Backend\Outbox::class);
 if (!$outbox->boundary(1)) {
     $outbox->activate(1, $config->get(1));
 }
@@ -62,7 +62,7 @@ echo "PASS: real Magento placeOrder succeeded with Bridge unavailable; order {$o
 $before = array_filter($outbox->status(1), static fn ($row) => (int) $row['order_id'] === (int) $orderId);
 $assert(count($before) === 0, 'Outbox work ran inside order creation');
 
-$runner = $om->create(\Rejoiner\Acr\Model\Backend\Runner::class, ['config' => $config]);
+$runner = $om->create(\QueenOne\Connect\Model\Backend\Runner::class, ['config' => $config]);
 $runner->runStore(1);
 $find = static function () use ($outbox, $orderId): array {
     $rows = array_values(array_filter($outbox->status(1), static fn ($row) => (int) $row['order_id'] === (int) $orderId));
@@ -80,7 +80,7 @@ $payload = $db->fetchOne($db->select()->from($resource->getTableName('queen_one_
     ->where('entity_id = ?', $row['entity_id']));
 $assert(json_decode($payload, true, 512, JSON_THROW_ON_ERROR)['order']['entity_id'] === (string) $orderId, 'Wrong native order');
 // The recovery receiver is deliberately simulated: this proves outbox state, not staging EC delivery.
-$transport = new class extends \Rejoiner\Acr\Model\Backend\Transport {
+$transport = new class extends \QueenOne\Connect\Model\Backend\Transport {
     public int $calls = 0;
     public function send(string $endpoint, string $body, string $secret): int
     {
@@ -90,7 +90,7 @@ $transport = new class extends \Rejoiner\Acr\Model\Backend\Transport {
     }
 };
 $outbox->update((int) $row['entity_id'], ['next_attempt_at' => '2000-01-01 00:00:00']);
-$recovery = $om->create(\Rejoiner\Acr\Model\Backend\Runner::class, ['config' => $config, 'transport' => $transport]);
+$recovery = $om->create(\QueenOne\Connect\Model\Backend\Runner::class, ['config' => $config, 'transport' => $transport]);
 $recovery->runStore(1);
 $recovery->runStore(1);
 $assert($find()['status'] === 'accepted' && $transport->calls === 1, 'Recovery or dedup failed');

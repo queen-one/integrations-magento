@@ -48,8 +48,10 @@ function fixture(overrides = {}) {
     const context = {window, document, Promise, setTimeout(fn) { timers.set(++timerId, fn); return timerId; },
         clearTimeout(id) { timers.delete(id); },
         define(deps, factory) {
-            if (!deps.length) mapper = factory();
-            else initializer = factory($, customerData, mapper);
+            if (!deps.length) { mapper = factory(); return; }
+            // The stub's positional ($, customerData, mapper) relies on this exact order.
+            assert.deepEqual([...deps], ['jquery', 'Magento_Customer/js/customer-data', 'QueenOne_Connect/js/event-mapper', 'mage/cookies']);
+            initializer = factory($, customerData, mapper);
         }};
     vm.runInNewContext(source('event-mapper'), context);
     vm.runInNewContext(source('storefront-tracking'), context);

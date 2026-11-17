@@ -7,7 +7,7 @@ Ops-assisted process. It does not create or rotate Bridge credentials.
 
 1. Confirm the exact customer Magento/PHP version, storefront type and product types.
 2. Confirm one approved Queen One Site ID and Bridge integration per Magento store.
-3. Pin the reviewed `dev-queen-one` source reference in the customer's `composer.lock`.
+3. Pin the reviewed `queen-one/module-connect` source reference in the customer's `composer.lock`.
 4. Back up the Magento database and record the prior module revision.
 5. Confirm standard Magento cron, synchronized host time and outbound HTTPS access.
 
@@ -54,8 +54,7 @@ secret channel. Ops validates and saves it through the existing Bridge
 
 4. Place one synthetic production order and trace its event ID through Magento outbox,
    Bridge queue and downstream `order_created`.
-5. Verify storefront events, catalog product/variant resolution and the absence of legacy
-   Rejoiner requests.
+5. Verify storefront events and catalog product/variant resolution.
 
 ## Operations and rollback
 

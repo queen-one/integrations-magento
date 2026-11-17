@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Rejoiner\Acr\Test\Unit;
+namespace QueenOne\Connect\Test\Unit;
 
 use PHPUnit\Framework\TestCase;
 
