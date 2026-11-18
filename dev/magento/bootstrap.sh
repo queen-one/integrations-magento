@@ -36,7 +36,7 @@ sync_plugin_compose() {
             cp "${generated_compose}" "${compose_override}"
         else
             echo "Preserving customized ${compose_override}."
-            if ! grep -Fq 'target: /var/www/html/app/code/Rejoiner/Acr/.local' "${compose_override}"; then
+            if ! grep -Fq 'target: /var/www/html/app/code/QueenOne/Connect/.local' "${compose_override}"; then
                 echo "Merge ${generated_compose} into it before starting the Magento lab." >&2
                 return 1
             fi
@@ -50,7 +50,7 @@ if ! docker info >/dev/null 2>&1; then
 fi
 
 if [ -x "${LAB_DIR}/bin/download" ]; then
-    printf 'REJOINER_MODULE_PATH=%s\n' "${REPOSITORY_ROOT}" > "${LAB_DIR}/.env"
+    printf 'QUEEN_ONE_MODULE_PATH=%s\n' "${REPOSITORY_ROOT}" > "${LAB_DIR}/.env"
     sync_plugin_compose
     echo "Magento Docker template already exists at ${LAB_DIR}"
     exit 0
@@ -74,7 +74,7 @@ git clone --quiet --depth 1 --branch "${TEMPLATE_VERSION}" \
 mkdir -p "${LAB_DIR}"
 cp -R "${TEMP_DIR}/docker-magento/compose/." "${LAB_DIR}/"
 sync_plugin_compose
-printf 'REJOINER_MODULE_PATH=%s\n' "${REPOSITORY_ROOT}" > "${LAB_DIR}/.env"
+printf 'QUEEN_ONE_MODULE_PATH=%s\n' "${REPOSITORY_ROOT}" > "${LAB_DIR}/.env"
 
 echo "Docker template created at ${LAB_DIR}"
 echo "Next: make magento-install"

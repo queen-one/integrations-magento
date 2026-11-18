@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Rejoiner\Acr\Console;
+namespace QueenOne\Connect\Console;
 
-use Rejoiner\Acr\Model\Backend\Config;
-use Rejoiner\Acr\Model\Backend\Outbox;
-use Rejoiner\Acr\Model\Backend\Runner;
+use QueenOne\Connect\Model\Backend\Config;
+use QueenOne\Connect\Model\Backend\Outbox;
+use QueenOne\Connect\Model\Backend\Runner;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;

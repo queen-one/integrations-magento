@@ -16,7 +16,7 @@
                     <comment>Required when storefront or backend tracking is enabled.</comment>
                 </field>
                 <field id="tag_url" type="text" sortOrder="25" showInDefault="0" showInWebsite="0" showInStore="0">
-                    <backend_model>Rejoiner\Acr\Model\System\Config\Backend\TagUrl</backend_model>
+                    <backend_model>QueenOne\Connect\Model\System\Config\Backend\TagUrl</backend_model>
                 </field>
                 <field id="debug" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Debug</label>

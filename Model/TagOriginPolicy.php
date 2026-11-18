@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Rejoiner\Acr\Model;
+namespace QueenOne\Connect\Model;
 
 use Magento\Csp\Api\PolicyCollectorInterface;
 use Magento\Csp\Model\Policy\FetchPolicy;

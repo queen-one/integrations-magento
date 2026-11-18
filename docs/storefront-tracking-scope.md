@@ -47,11 +47,9 @@ The adapter checks consent before publishing and on Magento's acceptance event/c
 
 The adapter's pre-load buffer holds at most 100 events for 15 seconds. Load errors, timeout, overflow or conflicting site ownership disable its publication for that document. Exceptions and rejected pushes do not propagate to commerce callbacks. Tracking logs contain diagnostic codes/error types, not customer payloads. The Tag remains responsible for delivery and retry behavior after accepting a push. HTTP acceptance and downstream visibility must be tested separately.
 
-## Rejoiner disconnection
+## Relationship to the legacy Rejoiner plugin
 
-This release has no legacy or dual mode. Old frontend layouts, RequireJS hooks, customer-data section, backend observers, cron, newsletter plugins and recovery route registrations are disconnected. The legacy HTTP client entry point is disabled even if old credentials remain saved. Turning Connect off does not reactivate Rejoiner.
-
-The internal `Rejoiner_Acr` module, Composer identity and old tables are retained pending a separate packaging/cleanup decision. Dormant legacy classes/templates remain in the repository. Reintroducing old custom theme overrides or running an old release is not supported by this foundation.
+This module contains no Rejoiner code. It is packaged separately from the legacy Rejoiner plugin (`rejoiner/module-acr`, module `Rejoiner_Acr`) and shares no PHP classes, configuration paths, database tables, cron jobs, routes or customer-data sections with the legacy Rejoiner releases of that package. It replaces that package's `dev-queen-one` pilot build; the [README](../README.md) covers the migration, and Composer refuses to install both. Connect never reads Rejoiner settings, and enabling or disabling Connect does not change the legacy plugin.
 
 ## Deferred capabilities register
 
@@ -67,14 +65,14 @@ External ticket links are intentionally unassigned until real follow-up issues e
 | SF-04 | Conversion tracking | Milestone 2: reliable Magento order lifecycle → queue → Bridge → `order_created` | One complete authoritative order downstream, retries/deduplication tested, no dependence on success page | — |
 | SF-05 | Newsletter, lists and subscription consent | Explicitly outside this milestone; list mapping, UI and backend flows required | Subscribe/unsubscribe and consent changes validated end-to-end | — |
 | SF-06 | Coupon generation | Reporting `promo` is supported; generating Magento coupons is a separate capability | Selected generation rules, delivery and redemption tested | — |
-| SF-07 | Cart restoration links | Cart state tracking is supported; legacy restoration endpoint is disconnected | Recovery URL restores correct products, quantities and options with approved access behavior | — |
+| SF-07 | Cart restoration links | Cart state tracking is supported; this module has no restoration endpoint | Recovery URL restores correct products, quantities and options with approved access behavior | — |
 | SF-08 | Explicit checkout event | Five events selected as the minimum; campaign need not yet established | Agreed event name, payload and checkout trigger validated without duplicate events | — |
 | SF-09 | Bundles, fractional quantities, variant-selection events | Source/schema mapping needs expansion | Complete cart/event payloads preserve quantities, amounts and identifiers for these cases | — |
 | SF-10 | Hyvä/headless and broader CMP/revocation support | RequireJS/customer-data and native cookie consent are the first lane | Each additional storefront/consent integration has its own passing validation matrix | — |
 
 ### Temporary conversion gap
 
-The legacy module sends order details through frontend `sendConversion`, and separately calls backend Rejoiner `convert` with only the purchaser email, immediately or via cron. Both paths originate from the success-page flow. This milestone disconnects both, and does **not** replace them with frontend `order_created`.
+The legacy module sends order details through frontend `sendConversion`, and separately calls backend Rejoiner `convert` with only the purchaser email, immediately or via cron. Both paths originate from the success-page flow. This module implements neither, and does **not** replace them with frontend `order_created`.
 
 This storefront foundation alone has no purchase/conversion signal and must not be
 described as a complete production campaign migration. Milestone 2 now adds a separate,

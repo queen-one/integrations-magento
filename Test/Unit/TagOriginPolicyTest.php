@@ -1,15 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace Rejoiner\Acr\Test\Unit;
+namespace QueenOne\Connect\Test\Unit;
 
 use Magento\Csp\Model\Collector\FetchPolicyMerger;
 use Magento\Csp\Model\CompositePolicyCollector;
 use Magento\Csp\Model\Policy\FetchPolicy;
 use Magento\Framework\App\State;
 use PHPUnit\Framework\TestCase;
-use Rejoiner\Acr\Model\TagOriginPolicy;
-use Rejoiner\Acr\Model\TrackingConfig;
+use QueenOne\Connect\Model\TagOriginPolicy;
+use QueenOne\Connect\Model\TrackingConfig;
 
 class TagOriginPolicyTest extends TestCase
 {

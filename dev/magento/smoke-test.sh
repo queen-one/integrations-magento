@@ -19,25 +19,19 @@ echo "Checking runtime versions..."
 bin/cli php -v | sed -n '1p'
 bin/magento --version
 
-echo "Checking the module mount and PHP 8.5 compatibility files..."
-if bin/cli test -e app/code/Rejoiner/Acr/.local/magento; then
-    echo "FAIL: the generated Magento lab is recursively mounted inside Rejoiner_Acr" >&2
+echo "Checking the module mount and PHP syntax..."
+if bin/cli test -e app/code/QueenOne/Connect/.local/magento; then
+    echo "FAIL: the generated Magento lab is recursively mounted inside QueenOne_Connect" >&2
     exit 1
 fi
-bin/cli php -l app/code/Rejoiner/Acr/Helper/Data.php >/dev/null
-bin/cli php -l app/code/Rejoiner/Acr/Observer/ControllerActionPredispatch.php >/dev/null
-bin/cli php -l app/code/Rejoiner/Acr/CustomerData/QueenOne.php >/dev/null
-bin/cli php -l app/code/Rejoiner/Acr/Block/StorefrontTracking.php >/dev/null
-bin/cli php -l app/code/Rejoiner/Acr/Model/TrackingConfig.php >/dev/null
-bin/cli php -l app/code/Rejoiner/Acr/Model/TagOriginPolicy.php >/dev/null
-bin/cli php -l app/code/Rejoiner/Acr/Model/Backend/Config.php >/dev/null
-bin/cli php -l app/code/Rejoiner/Acr/Test/Unit/SystemConfigTest.php >/dev/null
 echo "PASS: generated lab is masked from the module mount"
+bin/cli bash -c 'find app/code/QueenOne/Connect -path app/code/QueenOne/Connect/.local -prune -o -name "*.php" -print0 | xargs -0 -n1 php -l >/dev/null'
+echo "PASS: all module PHP files lint"
 
 echo "Checking module and Magento schema status..."
-bin/magento module:status Rejoiner_Acr
+bin/magento module:status QueenOne_Connect
 bin/magento setup:db:status
-bin/cli php app/code/Rejoiner/Acr/dev/magento/check-tracking.php
+bin/cli php app/code/QueenOne/Connect/dev/magento/check-tracking.php
 
 assert_schema_object() {
     label="$1"
@@ -51,18 +45,6 @@ assert_schema_object() {
 }
 
 schema_failed=0
-assert_schema_object \
-    "rejoiner_acr_success_orders table" \
-    "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = 'rejoiner_acr_success_orders';" \
-    || schema_failed=1
-assert_schema_object \
-    "quote.promo column" \
-    "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'quote' AND column_name = 'promo';" \
-    || schema_failed=1
-assert_schema_object \
-    "newsletter_subscriber.added_to_rejoiner column" \
-    "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'newsletter_subscriber' AND column_name = 'added_to_rejoiner';" \
-    || schema_failed=1
 assert_schema_object \
     "queen_one_order_boundary table" \
     "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = 'queen_one_order_boundary';" \
@@ -83,7 +65,7 @@ curl --fail --insecure --silent --show-error --max-time 30 \
 echo "PASS: storefront responds"
 
 if [ "${schema_failed}" != "0" ]; then
-    echo "Smoke test failed because the legacy module did not create its complete schema." >&2
+    echo "Smoke test failed because the module did not create its complete schema." >&2
     exit 1
 fi
 

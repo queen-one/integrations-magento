@@ -1,7 +1,7 @@
 define([
     'jquery',
     'Magento_Customer/js/customer-data',
-    'Rejoiner_Acr/js/event-mapper',
+    'QueenOne_Connect/js/event-mapper',
     'mage/cookies'
 ], function ($, customerData, mapper) {
     'use strict';

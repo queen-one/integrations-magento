@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Rejoiner\Acr\Model;
+namespace QueenOne\Connect\Model;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;

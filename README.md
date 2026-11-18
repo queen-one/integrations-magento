@@ -1,13 +1,16 @@
 # Queen One Connect for Magento 2
 
-This branch provides the managed-pilot Queen One integration for Magento 2. It publishes
-storefront page, product, cart and logged-in identity events through Queen One Tag and
-delivers persisted orders to Bridge through a signed backend outbox. Legacy Rejoiner
-runtime, API calls and feature registrations remain disconnected.
+`queen-one/module-connect` (Magento module `QueenOne_Connect`) is the managed-pilot Queen One
+integration for Magento 2. It publishes storefront page, product, cart and logged-in identity
+events through Queen One Tag and delivers persisted orders to Bridge through a signed backend
+outbox.
 
-The internal module name `Rejoiner_Acr`, Composer identity and retained legacy database
-tables are unchanged for upgrade compatibility. Store provisioning is still performed
-with Queen One Ops for this pilot; self-service onboarding is a later milestone.
+It is packaged separately from the legacy Rejoiner plugin (`rejoiner/module-acr`, module
+`Rejoiner_Acr`). It shares no PHP classes, configuration paths, database tables, cron jobs,
+routes or customer-data sections with the legacy Rejoiner releases of that package, and it
+replaces that package's `dev-queen-one` pilot build (see the migration steps below). Store
+provisioning is still performed with Queen One Ops for this pilot; self-service onboarding is
+a later milestone.
 
 ## Production defaults
 
@@ -39,15 +42,20 @@ Core, Collector and Frames origins before enabling storefront tracking.
 
 ## Managed production installation
 
-Install the reviewed `dev-queen-one` revision through the customer's Composer repository
-and commit the resulting `composer.lock`. The locked source reference, not the moving
-branch name, is the release boundary for the pilot. Do not run an unreviewed update of the
-branch on a production store.
+Install a reviewed release of `queen-one/module-connect` from Packagist and commit the
+resulting `composer.lock`:
+
+```sh
+composer require queen-one/module-connect:^1.0
+```
+
+The locked release version, not a branch name, is the release boundary for the pilot. Do not
+run an unreviewed update on a production store.
 
 After installing the module and taking the normal database backup:
 
 ```sh
-bin/magento module:enable Rejoiner_Acr
+bin/magento module:enable QueenOne_Connect
 bin/magento setup:upgrade
 bin/magento setup:di:compile
 bin/magento setup:static-content:deploy
@@ -57,6 +65,21 @@ bin/magento cache:clean
 For an upgrade, clean generated static/view-preprocessed artifacts through the customer's
 normal deployment procedure before static-content deployment so files removed by an older
 module revision cannot remain as stale symlinks.
+
+### Moving a store off the `rejoiner/module-acr` `dev-queen-one` build
+
+Earlier pilot builds shipped this code as `rejoiner/module-acr` `dev-queen-one`, module
+`Rejoiner_Acr`. Replace that requirement with `queen-one/module-connect` in a single
+deployment, enable `QueenOne_Connect` and run `setup:upgrade`. Configuration under
+`checkout/queen_one_connect/*`, activation boundaries and outbox rows carry over because the
+paths and table names are unchanged. Never install both builds together: they register the
+same layout block, cron job and customer-data section, and Composer refuses the combination.
+The pilot build's legacy database objects stay in place, unused: the
+`rejoiner_acr_success_orders` table, the `quote.promo` and
+`newsletter_subscriber.added_to_rejoiner` columns, and the `Rejoiner_Acr` row in
+`setup_module`. Rolling back is the reverse swap in a single deployment: require
+`rejoiner/module-acr` `dev-queen-one` in place of `queen-one/module-connect`, enable
+`Rejoiner_Acr` and run `setup:upgrade`.
 
 Queen One Ops provisions the Bridge integration, Magento store binding and unique HMAC
 secret. At the target **store view** scope under **Stores → Configuration → Sales →

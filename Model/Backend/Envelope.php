@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Rejoiner\Acr\Model\Backend;
+namespace QueenOne\Connect\Model\Backend;
 
 use Magento\Sales\Model\Order;
 

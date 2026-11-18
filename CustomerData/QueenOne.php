@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Rejoiner\Acr\CustomerData;
+namespace QueenOne\Connect\CustomerData;
 
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Cookie\Helper\Cookie;
@@ -9,8 +9,8 @@ use Magento\Customer\CustomerData\SectionSourceInterface;
 use Magento\Customer\Model\Session as CustomerSession;
 use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
-use Rejoiner\Acr\Model\CartSnapshot;
-use Rejoiner\Acr\Model\TrackingConfig;
+use QueenOne\Connect\Model\CartSnapshot;
+use QueenOne\Connect\Model\TrackingConfig;
 use Throwable;
 
 class QueenOne implements SectionSourceInterface

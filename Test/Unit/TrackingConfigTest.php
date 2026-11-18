@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Rejoiner\Acr\Test\Unit;
+namespace QueenOne\Connect\Test\Unit;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use PHPUnit\Framework\TestCase;
-use Rejoiner\Acr\Model\TrackingConfig;
+use QueenOne\Connect\Model\TrackingConfig;
 
 class TrackingConfigTest extends TestCase
 {

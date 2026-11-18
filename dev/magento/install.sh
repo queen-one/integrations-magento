@@ -42,12 +42,12 @@ if [ ! -f compose.override.yaml ]; then
 fi
 
 bin/restart
-bin/magento module:enable Rejoiner_Acr
+bin/magento module:enable QueenOne_Connect
 bin/magento setup:upgrade
 bin/magento cache:flush
 
 echo
-echo "Magento and Rejoiner_Acr are installed."
+echo "Magento and QueenOne_Connect are installed."
 echo "Storefront: https://${MAGENTO_DOMAIN}/"
 echo "Admin:      https://${MAGENTO_DOMAIN}/admin/"
 echo "Run verification with: make magento-smoke"
