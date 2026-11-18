@@ -7,7 +7,7 @@ Ops-assisted process. It does not create or rotate Bridge credentials.
 
 1. Confirm the exact customer Magento/PHP version, storefront type and product types.
 2. Confirm one approved Queen One Site ID and Bridge integration per Magento store.
-3. Pin the reviewed `queen-one/module-connect` source reference in the customer's `composer.lock`.
+3. Pin the reviewed `queen-one/module-connect` release in the customer's `composer.lock`.
 4. Back up the Magento database and record the prior module revision.
 5. Confirm standard Magento cron, synchronized host time and outbound HTTPS access.
 

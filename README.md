@@ -42,10 +42,15 @@ Core, Collector and Frames origins before enabling storefront tracking.
 
 ## Managed production installation
 
-Install a reviewed revision of `queen-one/module-connect` through the customer's Composer
-repository and commit the resulting `composer.lock`. The locked source reference, not a moving
-branch name, is the release boundary for the pilot. Do not run an unreviewed update on a
-production store.
+Install a reviewed release of `queen-one/module-connect` from Packagist and commit the
+resulting `composer.lock`:
+
+```sh
+composer require queen-one/module-connect:^1.0
+```
+
+The locked release version, not a branch name, is the release boundary for the pilot. Do not
+run an unreviewed update on a production store.
 
 After installing the module and taking the normal database backup:
 
